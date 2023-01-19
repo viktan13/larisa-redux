@@ -3,16 +3,26 @@ import {connect} from "react-redux";
 
 const Task = (props) => {
 
-    const {task, deleteTask} = props;
+    const {task, deleteTask, index, taskLength} = props;
 
     return (
-        <li>
+        <li style={task.isDone ? {textDecoration: 'line-through'} : null}>
             {task.title}
             <button onClick={() => deleteTask(task.id)}>Delete</button>
+            <button onClick={() => props.checkIsDone(task.id)}>Done</button>
+            <button disabled={index === 0} onClick={() => props.moveTask(task.id, 'up')}>↑</button>
+            {index !== taskLength - 1 && <button onClick={() => props.moveTask(task.id, 'down')}>↓</button>}
+
         </li>
     );
 };
-const mapDispatchToProps = dispatch => ({
-    deleteTask: (id) => dispatch({type: 'DELETE_TASK', payload: id})
+
+const mapStateToProps = state => ({
+    taskLength: state.todoList.length
 })
-export default connect(null, mapDispatchToProps)(Task);
+const mapDispatchToProps = dispatch => ({
+    deleteTask: (id) => dispatch({type: 'DELETE_TASK', payload: id}),
+    checkIsDone: (id) => dispatch({type: 'CHECK_IS_DONE', payload: id}),
+    moveTask: (id, direction) => dispatch({type: 'MOVE_TASK', payload: {id, direction}})
+})
+export default connect(mapStateToProps, mapDispatchToProps)(Task);
